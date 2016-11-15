@@ -1,0 +1,36 @@
+---
+boxes:
+  puppetlabs/ubuntu-14.04-64-nocm: 'https://vagrantcloud.com/puppetlabs/boxes/ubuntu-14.04-64-nocm'
+  puppetlabs/centos-7.0-64-nocm: 'https://vagrantcloud.com/puppetlabs/boxes/centos-7.0-64-nocm'
+  puppetlabs/debian-7.8-64-nocm: 'https://vagrantcloud.com/puppetlabs/boxes/debian-7.8-64-nocm'
+
+domain: 'dev.local'
+
+# Nodes
+nodes:
+  - hostname: 'xagent'
+    box_name: 'puppetlabs/debian-7.8-64-nocm'
+    cpus: 2
+    memory: 512
+    networks:
+      - private_network:
+          ip: '10.0.0.11'
+    forwarded_ports:
+      - host: 8080
+        guest: 80
+    providers:
+      virtualbox:
+        gui: false
+    provisioners:
+      - shell:
+          path: 'vagrant/puppet/debian_install.sh'
+      - puppet:
+          working_path: '/vagrant/'
+          hiera_config_path: 'hiera.yaml'
+          module_path: 'modules'
+          manifest_path: 'manifests'
+          manifest_file: 'site.pp'
+          options: '--verbose --debug'
+    synced_folders:
+      #- host: "/tmp/"
+      #  guest: "/mytmp"
